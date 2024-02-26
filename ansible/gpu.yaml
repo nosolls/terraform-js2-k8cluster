@@ -1,38 +1,28 @@
 ---
-- hosts: leader
+- hosts: gpu
+
   tasks:
-    - name: initialize the k8 cluster
-      shell: kubeadm init --pod-network-cidr 192.168.0.0/16 >> cluster_initialized.txt
+    - name: get kubeadm token from leader
+      shell: kubeadm token create --print-join-command
+      delegate_to: "{{ item }}"
+      loop: "{{ groups['leader'] }}"
+      register: k8_join_command
+      run_once: true
+
+    - name: joining cluster
       become: true
-      args:
-        chdir: /home/ubuntu/
-        creates: cluster_initialized.txt
+      shell: " {{ item.stdout }}"
+      loop: "{{ k8_join_command.results }}"
 
-    - name: create .kube
-      file:
-        state: directory
-        path: /home/ubuntu/.kube
+- hosts: leader
 
-    - name: copying over admin config
-      copy:
-        src: /etc/kubernetes/admin.conf
-        dest: /home/ubuntu/.kube/config
-        remote_src: true
-        owner: ubuntu
-        group: ubuntu
-      become: true
-
-    - name: installing calico networking
-      command: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+  tasks:
 
     - name: testing access to cluster
-      command: kubectl get nodes
+      shell: kubectl get nodes
       register: get_nodes
+      become_user: ubuntu
 
     - name: printing get_nodes
       debug:
         msg: "{{ get_nodes }}"
-
-    - name: getting cluster join token
-      shell: kubeadm token create --print-join-command
-      register: k8_join_command
