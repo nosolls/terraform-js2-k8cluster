@@ -14,6 +14,50 @@
       shell: " {{ item.stdout }}"
       loop: "{{ k8_join_command.results }}"
 
+    - name: install nvidia-container-toolkit
+      shell: |
+        distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+        curl -s -L https://nvidia.github.io/libnvidia-container/gpgkey | sudo apt-key add -
+        sudo apt-get update && sudo apt-get install -y nvidia-container-toolkit
+
+    - name: configure docker
+      shell: | 
+        echo "{
+            "default-runtime": "nvidia",
+            "runtimes": {
+                "nvidia": {
+                    "path": "/usr/bin/nvidia-container-runtime",
+                    "runtimeArgs": []
+                }
+            }
+        }" > /etc/docker/daemon.json
+
+    - name: restart docker
+      shell: sudo systemctl restart docker
+
+    - name: configure containerd
+      shell: |
+        sed -i "45,157d" /etc/containerd/config.toml
+        ex testing.txt <<eof
+        3 insert
+          [plugins."io.containerd.grpc.v1.cri"]
+            [plugins."io.containerd.grpc.v1.cri".containerd]
+              default_runtime_name = "nvidia"
+        
+              [plugins."io.containerd.grpc.v1.cri".containerd.runtimes]
+                [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.nvidia]
+                  privileged_without_host_devices = false
+                  runtime_engine = ""
+                  runtime_root = ""
+                  runtime_type = "io.containerd.runc.v2"
+                  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.nvidia.options]
+        .
+        xit
+        eof
+
+    - name: restart containerd
+      shell: sudo systemctl restart containerd
+
 - hosts: leader
 
   tasks:
@@ -26,3 +70,6 @@
     - name: printing get_nodes
       debug:
         msg: "{{ get_nodes }}"
+
+    - name: Enable GPU Support in Kubernetes
+      shell: kubectl create -f https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/v0.14.4/nvidia-device-plugin.yml
