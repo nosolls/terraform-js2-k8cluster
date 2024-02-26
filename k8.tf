@@ -33,7 +33,7 @@ resource "openstack_compute_floatingip_associate_v2" "terraform_floatubntu20_lea
 
 
 
-# creating Ubuntu20 instance
+# creating Ubuntu20 instance (CPU)
 resource "openstack_compute_instance_v2" "Ubuntu20_follower" {
   name = "terraform_Ubuntu20_follower${count.index}"
   # ID of JS-API-Featured-Ubuntu20-Latest
@@ -64,6 +64,40 @@ resource "openstack_compute_floatingip_associate_v2" "terraform_floatubntu20_fol
   instance_id = "${openstack_compute_instance_v2.Ubuntu20_follower[count.index].id}"
     count     = var.vm_number
 }
+
+
+# creating Ubuntu20 instance (GPU)
+resource "openstack_compute_instance_v2" "Ubuntu20_gpu" {
+  name = "terraform_Ubuntu20_gpu${count.index}"
+  # ID of JS-API-Featured-Ubuntu20-Latest
+  image_name = "Featured-Ubuntu20"
+  flavor_id   = var.gpu_flavor
+  # this public key is set above in security section
+  key_pair  = var.public_key
+  security_groups   = ["terraform_ssh_ping", "default"]
+  count     = var.vm_number
+  metadata = {
+    terraform_controlled = "yes"
+    ansible_role = "gpu"
+    terrform_role = "k8"
+  }
+  network {
+    name = "auto_allocated_network"
+  }
+}
+# creating floating ip from the public ip pool
+resource "openstack_networking_floatingip_v2" "terraform_floatip_ubuntu20_gpu" {
+  pool = "public"
+    count     = var.vm_number
+}
+
+# assigning floating ip from public pool to Ubuntu20 VM
+resource "openstack_compute_floatingip_associate_v2" "terraform_floatubntu20_gpu" {
+  floating_ip = "${openstack_networking_floatingip_v2.terraform_floatip_ubuntu20_gpu[count.index].address}"
+  instance_id = "${openstack_compute_instance_v2.Ubuntu20_gpu[count.index].id}"
+    count     = var.vm_number
+}
+
 
 resource "null_resource" "ansible_provisioners" {
   provisioner "remote-exec" {
