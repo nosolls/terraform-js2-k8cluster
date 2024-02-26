@@ -128,6 +128,7 @@ resource "null_resource" "ansible_provisioners" {
       "ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook -i ansible/inventory.ini ansible/k8_setup.yaml ",
       "ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook -i ansible/inventory.ini ansible/leader.yaml ",
       "ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook -i ansible/inventory.ini ansible/follower.yaml "
+      "ANSIBLE_HOST_KEY_CHECKING=false ansible-playbook -i ansible/inventory.ini ansible/gpu.yaml "
     ]
       connection {
         type = "ssh"
