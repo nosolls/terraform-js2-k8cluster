@@ -4,7 +4,7 @@
 # creating leader
 
 resource "openstack_compute_instance_v2" "Ubuntu20_leader" {
-  name = "terraform_Ubuntu20_leader"
+  name = "terraform_Ubuntu20_leader_"
   # ID of JS-API-Featured-Ubuntu20-Latest
   image_name = "Featured-Ubuntu20"
   flavor_id   = var.leader_flavor
@@ -35,7 +35,7 @@ resource "openstack_compute_floatingip_associate_v2" "terraform_floatubntu20_lea
 
 # creating Ubuntu20 instance (CPU)
 resource "openstack_compute_instance_v2" "Ubuntu20_follower" {
-  name = "terraform_Ubuntu20_follower${count.index}"
+  name = "terraform_Ubuntu20_follower_${count.index}"
   # ID of JS-API-Featured-Ubuntu20-Latest
   image_name = "Featured-Ubuntu20"
   flavor_id   = var.follower_flavor
@@ -68,7 +68,7 @@ resource "openstack_compute_floatingip_associate_v2" "terraform_floatubntu20_fol
 
 # creating Ubuntu20 instance (GPU)
 resource "openstack_compute_instance_v2" "Ubuntu20_gpu" {
-  name = "terraform_Ubuntu20_gpu${count.index}"
+  name = "terraform_Ubuntu20_gpu_${count.index}"
   # ID of JS-API-Featured-Ubuntu20-Latest
   image_name = "Featured-Ubuntu20"
   flavor_id   = var.gpu_flavor
