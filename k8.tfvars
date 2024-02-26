@@ -11,4 +11,4 @@ gpu_flavor = "10"
 
 # number of followers for the cluster
 vm_number = "1"
-
+vm_gpu_number = "1"

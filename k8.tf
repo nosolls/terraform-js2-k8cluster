@@ -75,7 +75,7 @@ resource "openstack_compute_instance_v2" "Ubuntu20_gpu" {
   # this public key is set above in security section
   key_pair  = var.public_key
   security_groups   = ["terraform_ssh_ping", "default"]
-  count     = var.vm_number
+  count     = var.vm_gpu_number
   metadata = {
     terraform_controlled = "yes"
     ansible_role = "gpu"
@@ -88,14 +88,14 @@ resource "openstack_compute_instance_v2" "Ubuntu20_gpu" {
 # creating floating ip from the public ip pool
 resource "openstack_networking_floatingip_v2" "terraform_floatip_ubuntu20_gpu" {
   pool = "public"
-    count     = var.vm_number
+    count     = var.vm_gpu_number
 }
 
 # assigning floating ip from public pool to Ubuntu20 VM
 resource "openstack_compute_floatingip_associate_v2" "terraform_floatubntu20_gpu" {
   floating_ip = "${openstack_networking_floatingip_v2.terraform_floatip_ubuntu20_gpu[count.index].address}"
   instance_id = "${openstack_compute_instance_v2.Ubuntu20_gpu[count.index].id}"
-    count     = var.vm_number
+    count     = var.vm_gpu_number
 }
 
 

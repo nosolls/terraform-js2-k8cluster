@@ -1,6 +1,11 @@
 variable "vm_number" {
   default = "1"
 }
+
+variable "vm_gpu_number" {
+  default = "1"
+}
+
 variable "public_key" {
   default = ""
 }
