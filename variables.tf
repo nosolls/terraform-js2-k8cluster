@@ -1,5 +1,5 @@
 variable "vm_number" {
-  default = "5"
+  default = "1"
 }
 variable "public_key" {
   default = ""
@@ -10,9 +10,9 @@ variable "leader_flavor" {
 }
 
 variable "follower_flavor" {
-  default = "2"
+  default = "4"
 }
 
 variable "gpu_flavor" {
-  default = "5"
+  default = "10"
 }

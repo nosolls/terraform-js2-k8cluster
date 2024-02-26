@@ -6,8 +6,9 @@ public_key = "!! Replace Me!!"
 # You can get a list of flavors with the following command
 # openstack flavor list
 leader_flavor = "3"
-follower_flavor = "2"
+follower_flavor = "4"
+gpu_flavor = "10"
 
 # number of followers for the cluster
-vm_number = "5"
+vm_number = "1"
 

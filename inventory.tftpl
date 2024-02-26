@@ -6,3 +6,7 @@ ${ip} ansible_connection=ssh        ansible_user=ubuntu
 %{ for ip in ansible_follower_ip}
 ${ip} ansible_connection=ssh        ansible_user=ubuntu
 %{ endfor ~}
+[gpu]
+%{ for ip in ansible_gpu_ip}
+${ip} ansible_connection=ssh        ansible_user=ubuntu
+%{ endfor ~}
