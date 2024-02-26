@@ -12,3 +12,7 @@ variable "leader_flavor" {
 variable "follower_flavor" {
   default = "2"
 }
+
+variable "gpu_flavor" {
+  default = "5"
+}
