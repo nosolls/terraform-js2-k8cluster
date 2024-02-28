@@ -15,14 +15,17 @@
       loop: "{{ k8_join_command.results }}"
 
     - name: install nvidia-container-toolkit
+      become: true
       shell: |
         distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
         curl -s -L https://nvidia.github.io/libnvidia-container/gpgkey | sudo apt-key add -
-        sudo apt-get update && sudo apt-get install -y nvidia-container-toolkit
+        curl -s -L https://nvidia.github.io/libnvidia-container/$distribution/libnvidia-container.list | sudo tee /etc/apt/sources.list.d/libnvidia-container.list
+        apt-get update && apt-get install -y nvidia-container-toolkit
 
     - name: configure docker
+      become: true
       shell: | 
-        echo "{
+        echo '{
             "default-runtime": "nvidia",
             "runtimes": {
                 "nvidia": {
@@ -30,33 +33,20 @@
                     "runtimeArgs": []
                 }
             }
-        }" > /etc/docker/daemon.json
+        }' > /etc/docker/daemon.json
 
     - name: restart docker
-      shell: sudo systemctl restart docker
+      become: true
+      shell: systemctl restart docker
 
     - name: configure containerd
+      become: true
       shell: |
-        sed -i "45,157d" /etc/containerd/config.toml
-        ex testing.txt <<eof
-        3 insert
-          [plugins."io.containerd.grpc.v1.cri"]
-            [plugins."io.containerd.grpc.v1.cri".containerd]
-              default_runtime_name = "nvidia"
-        
-              [plugins."io.containerd.grpc.v1.cri".containerd.runtimes]
-                [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.nvidia]
-                  privileged_without_host_devices = false
-                  runtime_engine = ""
-                  runtime_root = ""
-                  runtime_type = "io.containerd.runc.v2"
-                  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.nvidia.options]
-        .
-        xit
-        eof
+        curl -O https://raw.githubusercontent.com/nosolls/terraform-js2-k8cluster/main/config.toml && cp config.toml /etc/containerd/config.toml
 
     - name: restart containerd
-      shell: sudo systemctl restart containerd
+      become: true
+      shell: systemctl restart containerd
 
 - hosts: leader
 

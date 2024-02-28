@@ -66,7 +66,7 @@
 
     - name: Adding K8 apt key
       apt_key:
-        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg.asc
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
         state: present
 
     - name: Adding K8 repo (kubernetes-xenial)
@@ -76,7 +76,7 @@
 
     - name: Installing K8 packages
       apt:
-        name: [kubelet, kubeadm, kubectl]
+        name: [kubelet=1.27.4-00, kubeadm=1.27.4-00, kubectl=1.27.4-00]
         state: present
         update_cache: true
 

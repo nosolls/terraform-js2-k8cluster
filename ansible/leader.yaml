@@ -1,5 +1,6 @@
 ---
 - hosts: leader
+
   tasks:
     - name: initialize the k8 cluster
       shell: kubeadm init --pod-network-cidr 192.168.0.0/16 >> cluster_initialized.txt
