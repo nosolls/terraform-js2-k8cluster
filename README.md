@@ -1,5 +1,5 @@
 # k8cluster-terraform
-This will create a k8 cluster using terraform on Jetstream 2. Has options for CPU and GPU nodes. Work in progress.
+This will create a k8 cluster using terraform on Jetstream 2. Has options for CPU and GPU nodes. Currently works on Jetstream 2.
 
 ## Howto
 1. Add the name of your public key to k8.tfvars
