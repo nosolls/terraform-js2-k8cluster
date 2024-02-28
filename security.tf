@@ -3,7 +3,7 @@
 ################
 #creating security group
 resource "openstack_compute_secgroup_v2" "terraform_ssh_ping_centos" {
-  name = "terraform_ssh_ping_${var.public_key}"
+  name = "terraform_ssh__ping_${var.public_key}"
   description = "Security group with SSH and PING open to 0.0.0.0/0"
 
   #ssh rule
@@ -17,6 +17,18 @@ resource "openstack_compute_secgroup_v2" "terraform_ssh_ping_centos" {
     from_port   = -1
     to_port     = -1
     ip_protocol = "icmp"
+    cidr        = "0.0.0.0/0"
+  }
+  rule {
+    from_port = "80"
+    to_port   = "80"
+    ip_protocol = "tcp"
+    cidr        = "0.0.0.0/0"
+  }
+  rule {
+    from_port = "443"
+    to_port   = "443"
+    ip_protocol = "tcp"
     cidr        = "0.0.0.0/0"
   }
 
